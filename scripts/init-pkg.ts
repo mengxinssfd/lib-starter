@@ -1,15 +1,15 @@
-const path = require('path');
-const { prompt } = require('enquirer');
-const childProcess = require('child_process');
-const semver = require('semver');
-const chalk = require('chalk');
-const fs = require('fs');
+import * as path from 'path';
+import { prompt } from 'enquirer';
+import childProcess from 'child_process';
+import semver from 'semver';
+import chalk from 'chalk';
+import fs from 'fs';
 
 const projectPath = path.resolve(__dirname, '../');
 const pkgPath = path.resolve(projectPath, 'package.json');
 const pkg = require(pkgPath);
 
-function cmdGet(cmd) {
+function cmdGet(cmd: string) {
   try {
     return childProcess.execSync(cmd).toString().trim();
   } catch (e) {
@@ -79,7 +79,7 @@ async function getConfig() {
 
   console.log(chalk.green(JSON.stringify(config, null, 2)));
 
-  const { confirm } = await prompt({
+  const { confirm } = await prompt<{ confirm: string }>({
     type: 'confirm',
     name: 'confirm',
     message: '是否确认',

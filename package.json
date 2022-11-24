@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "一个基于pnpm monorepo、vue3、vite、多页的快速启动模版，主要用于写一些例子等",
   "scripts": {
-    "init-pkg": "node scripts/init-pkg.js",
+    "init-pkg": "ts-node scripts/init-pkg.ts",
     "dev": "vite --port 8080",
     "check-deps": "ncu",
     "test": "jest",
@@ -11,7 +11,7 @@
     "prepare": "husky install",
     "husky-msg-init": "husky add .husky/pre-commit \"npx lint-staged --allow-empty \"$1\"\"&husky add .husky/commit-msg \"npx commitlint --edit \"$1\"\"",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "ts-check": "tsc --noEmit",
+    "ts-check": "tsc --noEmit && tsc -p ./tsconfig.node.json --noEmit",
     "lint-check": "eslint pages",
     "prettier-check": "prettier pages --check",
     "check-all": "run-p ts-check lint-check prettier-check",
