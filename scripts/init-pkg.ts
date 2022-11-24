@@ -3,7 +3,7 @@ import { prompt } from 'enquirer';
 import childProcess from 'child_process';
 import semver from 'semver';
 import chalk from 'chalk';
-import fs from 'fs';
+import * as fs from 'fs';
 
 const projectPath = path.resolve(__dirname, '../');
 const pkgPath = path.resolve(projectPath, 'package.json');
