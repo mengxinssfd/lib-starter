@@ -2,7 +2,7 @@
   "$schema": "https://typedoc.org/schema.json",
   "htmlLang": "zh-CN",
   "includeVersion": true,
-  "name": "ts-utils",
+  "name": "lib-starter",
   "customCss": "./typedoc.theme.css",
   "entryPointStrategy": "packages",
   "entryPoints": [
@@ -24,6 +24,6 @@
     "Classes": 1.5
   },
   "navigationLinks": {
-    "GitHub": "https://github.com/mengxinssfd/ts-utils"
+    "GitHub": "https://github.com/mengxinssfd/lib-starter"
   }
 }

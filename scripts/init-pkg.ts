@@ -4,6 +4,12 @@ import childProcess from 'child_process';
 import semver from 'semver';
 import chalk from 'chalk';
 import * as fs from 'fs';
+import { setRepo } from './set-repo';
+
+export enum RepoType {
+  mono = 'mono',
+  multi = 'multi',
+}
 
 const projectPath = path.resolve(__dirname, '../');
 const pkgPath = path.resolve(projectPath, 'package.json');
@@ -17,65 +23,90 @@ function cmdGet(cmd: string) {
   }
 }
 
+export interface Config {
+  name: string;
+  description: string;
+  author: string;
+  keywords: string;
+  git: string;
+  version: string;
+  license: string;
+  repoType: RepoType;
+}
+
 async function getConfig() {
-  const config = {
+  const initConfig: Config = {
     name: path.basename(projectPath),
     description: pkg.description,
     author: cmdGet('git config user.name'),
     keywords: pkg.keywords.join(','),
-    git: cmdGet('git remote get-url origin'),
+    git: cmdGet('git remote get-url origin').replace(/^git@github.com:/, 'https://github.com/'),
     version: '0.0.0',
     license: pkg.license,
+    repoType: RepoType.multi,
   };
-  // 1.获取项目名称
-  ({ name: config.name } = await prompt({
-    type: 'input',
-    name: 'name',
-    initial: config.name,
-    message: '输入项目名称：',
-  }));
-  // 2.获取版本号version
-  ({ version: config.version } = await prompt({
-    type: 'input',
-    name: 'version',
-    initial: config.version,
-    message: '输入版本号(version)：',
-    validate(value) {
-      // 校验版本号
-      if (!semver.valid(value)) {
-        return `invalid version: ${value}`;
-      }
-      return true;
+
+  const reply = await prompt<Config>([
+    // 1.获取项目名称
+    {
+      type: 'input',
+      name: 'name',
+      initial: initConfig.name,
+      message: '输入项目名称：',
     },
-  }));
-  // 3.获取description
-  ({ description: config.description } = await prompt({
-    type: 'input',
-    name: 'description',
-    initial: config.description,
-    message: '输入项目描述(description)：',
-  }));
-  // 4.获取keywords
-  ({ keywords: config.keywords } = await prompt({
-    type: 'input',
-    name: 'keywords',
-    initial: config.keywords,
-    message: '输入关键词(keywords)：',
-  }));
-  // 5.获取author
-  ({ author: config.author } = await prompt({
-    type: 'input',
-    name: 'author',
-    initial: config.author,
-    message: '输入作者(author)：',
-  }));
-  // 6.获取license
-  ({ license: config.license } = await prompt({
-    type: 'input',
-    name: 'license',
-    initial: config.license,
-    message: '输入license：',
-  }));
+    // 2.获取版本号version
+    {
+      type: 'input',
+      name: 'version',
+      initial: initConfig.version,
+      message: '输入版本号(version)：',
+      validate(value) {
+        // 校验版本号
+        if (!semver.valid(value)) {
+          return `invalid version: ${value}`;
+        }
+        return true;
+      },
+    },
+    // 3.获取description
+    {
+      type: 'input',
+      name: 'description',
+      initial: initConfig.description,
+      message: '输入项目描述(description)：',
+    },
+    // 4.获取keywords
+    {
+      type: 'input',
+      name: 'keywords',
+      initial: initConfig.keywords,
+      message: '输入关键词(keywords)：',
+    },
+    // 5.获取author
+    {
+      type: 'input',
+      name: 'author',
+      initial: initConfig.author,
+      message: '输入作者(author)：',
+    },
+    // 6.获取license
+    {
+      type: 'input',
+      name: 'license',
+      initial: initConfig.license,
+      message: '输入license：',
+    },
+    // 7.repo类型
+    {
+      type: 'select',
+      name: 'repoType',
+      initial: RepoType.multi as any,
+      message: '选择repo类型：',
+      choices: [{ name: RepoType.mono }, { name: RepoType.multi }],
+    },
+  ]);
+
+  const config = { ...initConfig, ...reply };
 
   console.log(chalk.green(JSON.stringify(config, null, 2)));
 
@@ -115,6 +146,10 @@ async function setup() {
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
 
     console.log(chalk.cyan('初始化package.json完成...'));
+
+    console.log(chalk.cyan('初始化repo开始...'));
+    setRepo(config);
+    console.log(chalk.cyan('初始化repo完成...'));
   } catch (e) {
     console.log(e);
   }
