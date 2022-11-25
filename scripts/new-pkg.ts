@@ -3,7 +3,7 @@ import { prompt } from 'enquirer';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as tsUtils from '@mxssfd/core';
-import { getGitUrl } from './utils';
+import { getGitUrl, useFile } from './utils';
 import rootPkg from '../package.json';
 
 const pkgsPath = path.resolve(__dirname, '../packages');
@@ -245,6 +245,15 @@ describe('${config.pkgName}', function () {
 });
 `.trim();
     fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
+
+    step('修改typedoc配置开始');
+
+    const [typedocConfig, setFile] = useFile(path.resolve(__dirname, '../typedoc.json'), true);
+    if (!typedocConfig['entryPoints']) typedocConfig['entryPoints'] = [];
+    typedocConfig['entryPoints'].push('packages/' + config.name);
+    setFile(typedocConfig);
+
+    step('修改typedoc配置完成');
 
     step('finish');
   } catch (e) {
