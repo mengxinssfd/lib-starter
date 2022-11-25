@@ -47,8 +47,6 @@
     "pages/*/__tests__",
     "test/*/*.ts",
     "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "env.d.ts"
+    "src/**/*.ts",
   ]
 }

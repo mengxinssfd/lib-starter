@@ -1,12 +1,9 @@
 module.exports = {
-  /* 指定如何解析语法。*/
-  parser: 'vue-eslint-parser',
   /* 优先级低于parse的语法解析配置 */
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },
   extends: [
-    'plugin:vue/vue3-recommended',
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended', // typescript-eslint推荐规则
     'prettier',
