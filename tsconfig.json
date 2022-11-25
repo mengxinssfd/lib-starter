@@ -43,9 +43,7 @@
     "allowUnreachableCode": false
   },
   "include": [
-    "pages/*/src",
-    "pages/*/__tests__",
-    "test/*/*.ts",
+    "tests/*/*.ts",
     "src/**/*.d.ts",
     "src/**/*.ts",
   ]

@@ -4,14 +4,6 @@
   "includeVersion": true,
   "name": "lib-starter",
   "customCss": "./typedoc.theme.css",
-  "entryPointStrategy": "packages",
-  "entryPoints": [
-    "packages/core",
-    "packages/dom",
-    "packages/bom",
-    "packages/types",
-    "packages/random-picker"
-  ],
   "sort": ["static-first", "kind", "enum-value-ascending"],
   "categoryOrder": ["file"],
   "out": "./docs-html",
