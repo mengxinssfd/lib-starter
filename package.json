@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "description": "一个基于pnpm typescript monorepo/multirepo的lib快速启动仓库模板",
   "scripts": {
-    "init-pkg": "esno scripts/init-pkg.ts",
+    "pkg:init": "esno scripts/init-pkg.ts",
+    "pkg:new": "esno scripts/new-pkg.ts",
     "check-deps": "ncu",
     "test": "jest",
     "cov": "jest --coverage",
@@ -41,6 +42,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
+    "@mxssfd/core": "5.0.1-beta.1",
     "@mxssfd/typedoc-theme": "^1.0.3",
     "@types/jest": "^29.2.3",
     "@types/node": "^18.11.9",

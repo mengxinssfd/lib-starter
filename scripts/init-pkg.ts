@@ -1,10 +1,10 @@
 import * as path from 'path';
 import { prompt } from 'enquirer';
-import childProcess from 'child_process';
 import semver from 'semver';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import { setRepo } from './set-repo';
+import { cmdGet, getGitUrl } from './utils';
 
 export enum RepoType {
   mono = 'mono',
@@ -14,14 +14,6 @@ export enum RepoType {
 const projectPath = path.resolve(__dirname, '../');
 const pkgPath = path.resolve(projectPath, 'package.json');
 const pkg = require(pkgPath);
-
-function cmdGet(cmd: string) {
-  try {
-    return childProcess.execSync(cmd).toString().trim();
-  } catch (e) {
-    return '';
-  }
-}
 
 export interface Config {
   name: string;
@@ -40,7 +32,7 @@ async function getConfig() {
     description: pkg.description,
     author: cmdGet('git config user.name'),
     keywords: pkg.keywords.join(','),
-    git: cmdGet('git remote get-url origin').replace(/^git@github.com:/, 'https://github.com/'),
+    git: getGitUrl(),
     version: '0.0.0',
     license: pkg.license,
     repoType: RepoType.multi,
