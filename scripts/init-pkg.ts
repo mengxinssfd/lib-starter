@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { prompt } from 'enquirer';
-import semver from 'semver';
+import * as semver from 'semver';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import { setRepo } from './set-repo';

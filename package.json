@@ -17,7 +17,7 @@
     "check-all": "run-p ts-check lint-check prettier-check",
     "typedoc:build": "typedoc --plugin @mxssfd/typedoc-theme --theme my-theme",
     "typedoc:deploy": "gh-pages -d docs-html",
-    "build": "esno scripts/build.ts"
+    "build": "esno scripts/build.ts -t"
   },
   "lint-staged": {
     "pages/**/*.{js,jsx,ts,tsx,json,html,md}": [
@@ -75,6 +75,7 @@
     "prettier": "^2.8.0",
     "rimraf": "^3.0.2",
     "rollup": "^3.4.0",
+    "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
     "sass": "^1.56.1",
     "semver": "^7.3.8",

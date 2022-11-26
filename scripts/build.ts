@@ -114,7 +114,7 @@ async function buildType(target: string, pkgDirPath: string, pkgJson: Record<str
     await Fse.copy(nsPath, distNsPath);
   }
 
-  await Fse.remove(`${pkgDirPath}/dist/packages`);
+  await Fse.remove(Path.resolve(pkgDirPath, isMonoRepo ? `dist/packages` : 'dist/src'));
 }
 
 async function run() {

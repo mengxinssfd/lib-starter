@@ -1,7 +1,7 @@
 import { resolve, basename } from 'path';
 import chalk from 'chalk';
 import * as fs from 'fs';
-import childProcess from 'child_process';
+const childProcess = require('child_process');
 
 export function rootDir(path = ''): string {
   return resolve(__dirname, '../' + path);
@@ -79,7 +79,7 @@ export function useFile<
       _content = null;
       let result = content as string;
       if (parseJson) result = JSON.stringify(content, null, 2);
-      fs.writeFileSync(path, result);
+      fs.writeFileSync(path, result + '\n');
     },
   ];
 }

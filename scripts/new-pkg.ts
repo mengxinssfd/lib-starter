@@ -138,16 +138,22 @@ async function setup() {
   "name": "${config.pkgName}",
   "version": "${rootPkg.version}",
   "description": "${config.description}",
-  "main": "index.js",
+  "main": "dist/${config.name}.cjs.js",
   "module": "dist/${config.name}.esm-bundler.js",
+  "types": "dist/${config.name}.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/${config.name}.esm-bundler.js",
-      "require": "./index.js"
-    },
-    "./": "./dist"
+      "import": {
+        "node": "./dist/${config.name}.cjs.js",
+        "default": "./dist/${config.name}.esm-bundler.js"
+      },
+      "require": "./dist/${config.name}.cjs.js"
+    }
   },
-  "types": "dist/${config.name}.d.ts",
+  "buildOptions": {
+    "name": "${config.umdName}",
+    "formats": ${JSON.stringify(config.formats)}
+  },
   "typedoc": {
     "entryPoint": "./src/index.ts",
     "readmeFile": "./README.md",
@@ -163,10 +169,6 @@ async function setup() {
   "repository": {
     "type": "git",
     "url": "git+${gitUrl}"
-  },
-  "buildOptions": {
-    "name": "${config.umdName}",
-    "formats": ${JSON.stringify(config.formats)}
   },
   "scripts": {
     "apie": "api-extractor run"

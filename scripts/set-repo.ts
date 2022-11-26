@@ -2,7 +2,8 @@ import * as Path from 'path';
 import * as Fs from 'fs';
 import { Config, RepoType } from './init-pkg';
 import { execa } from 'execa';
-import { useFile } from './utils';
+import { rootDir, useFile } from './utils';
+import { toCamel } from '@mxssfd/core';
 
 const PnpmWorkspaceContent = `
 packages:
@@ -14,11 +15,11 @@ packages:
 `.trim();
 
 const paths = {
-  typedoc: Path.resolve(__dirname, '../typedoc.json'),
-  tsconfig: Path.resolve(__dirname, '../tsconfig.json'),
-  pnpmWorkspace: Path.resolve(__dirname, '../pnpm-workspace.yaml'),
-  pkgs: Path.resolve(__dirname, '../packages'),
-  src: Path.resolve(__dirname, '../src'),
+  typedoc: rootDir('typedoc.json'),
+  tsconfig: rootDir('tsconfig.json'),
+  pnpmWorkspace: rootDir('pnpm-workspace.yaml'),
+  pkgs: rootDir('packages'),
+  src: rootDir('src'),
 };
 
 export async function setRepo(config: Config) {
@@ -53,4 +54,38 @@ export async function setRepo(config: Config) {
 
   typedocJson['name'] = config.name;
   updateTypedoc(typedocJson);
+
+  // 生成src目录
+  Fs.mkdirSync(paths.src);
+  Fs.writeFileSync(Path.resolve(paths.src, 'index.ts'), `export const test = () => 'test';`);
+
+  // 更新package.json
+  const [pkgJson, updatePkg] = useFile(rootDir('package.json'), true);
+
+  pkgJson['main'] = `dist/${config.name}.cjs.js`;
+  pkgJson['module'] = `dist/${config.name}.esm-bundler.js`;
+  pkgJson['types'] = `dist/${config.name}.d.ts`;
+  pkgJson['exports'] = {
+    '.': {
+      import: {
+        node: `./dist/${config.name}.cjs.js`,
+        default: `./dist/${config.name}.esm-bundler.js`,
+      },
+      require: `./dist/${config.name}.cjs.js`,
+    },
+  };
+  pkgJson['buildOptions'] = {
+    name: toCamel(pkgJson['name'], '-', true),
+    formats: ['esm-bundler', 'esm-browser', 'cjs', 'global'],
+  };
+  updatePkg(pkgJson);
+
+  const [apiJson, updateApiJson] = useFile(rootDir('api-extractor.json'), true);
+
+  apiJson['mainEntryPointFilePath'] = './dist/src/index.d.ts';
+  apiJson['dtsRollup'] = {
+    enabled: true,
+    publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
+  };
+  updateApiJson(apiJson);
 }
