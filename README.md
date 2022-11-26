@@ -1,14 +1,32 @@
-# examples-starter
+# lib-starter
 
-一个基于 `pnpm` `monorepo`、`vue3`、`vite`、多页的快速启动模版，主要用于写一些例子等
+npm 库初始启动模板，减少重建项时繁琐的操作
+
+功能集成：
+
+- pnpm
+- typescript
+- jest
+- eslint,prettier
+- commit lint
+- d.ts 打包
+- changelog
+- rollup
+- typedoc
+- monorepo
+  - 添加子包脚本
+    - 依据提示生成项目初始 package
+    - 自动添加 src，**tests**目录
+    - 自动添加到 typedoc
+- multirepo
+- github action
+  - 合并、pr 检测
+  - 依赖更新检测
+- 自动打包发布脚本
 
 ## 使用步骤
 
 ### 1.安装依赖
-
-```shell
-pnpm install
-```
 
 项目使用的 `pnpm` 作为包管理工具，如未安装 `pnpm` 的话需要安装 `pnpm`
 
@@ -16,21 +34,38 @@ pnpm install
 npm install -g pnpm
 ```
 
-### 2.初始化 `package.json`
+然后
 
 ```shell
-pnpm init-pkg
+pnpm install
 ```
 
-### 3.更改`README.md`
+### 2.初始化项目
 
-### 4.更改[`CHANGELOG.md`](CHANGELOG.md)
+依赖安装完后会自动运行仓库初始化脚本，此时只要跟着提示填写或选择选项即可完成初始化仓库。
 
-### 5.添加页面
+也可以中断初始化，在需要时使用
 
-1. [`pages`](pages)目录下根据需要选择页面类型, 并添加相应的 page 目录
-2. 在根目录下的[`index.html`](index.html)添加 page 入口
+```shell
+npm run pkg:init
+```
 
-### 6.更新[`LICENSE`](LICENSE)
+命令初始化项目
+
+monorepo 添加 child package
+
+```shell
+npm run pkg:new
+```
+
+### 3.更新`README.md`
+
+### 4.清空[`CHANGELOG.md`](CHANGELOG.md)
+
+### 5.更新[`LICENSE`](LICENSE)
 
 [`package.json`](package.json)里面有`license`, 根目录下也有个文件[`LICENSE`](LICENSE)需要更新。
+
+```
+
+```
