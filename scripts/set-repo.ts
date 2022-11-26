@@ -7,15 +7,6 @@ import { toCamel } from '@mxssfd/core';
 import path from 'path';
 import fs from 'fs';
 
-const PnpmWorkspaceContent = `
-packages:
-  # all packages in subdirs of packages/ and components/
-  - 'packages/**'
-  # exclude packages that are inside test directories
-  - '!**/tests/**'
-  - '!**/test/**'
-`.trim();
-
 const paths = {
   typedoc: rootDir('typedoc.json'),
   tsconfig: rootDir('tsconfig.json'),
@@ -23,15 +14,19 @@ const paths = {
   pkgs: rootDir('packages'),
   src: rootDir('src'),
 };
-
-export async function setRepo(config: Config) {
-  const [typedocJson, updateTypedoc] = useFile(paths.typedoc, true);
-  typedocJson['navigationLinks'].GitHub = config.git.replace(/\.git$/, '');
-  if (config.repoType === RepoType.mono) {
-    // 1.设置pnpm-workspace.yaml
+const mono = {
+  createPnpmWorkspace() {
+    const PnpmWorkspaceContent = `
+packages:
+  # all packages in subdirs of packages/ and components/
+  - 'packages/**'
+  # exclude packages that are inside test directories
+  - '!**/tests/**'
+  - '!**/test/**'
+`.trim();
     Fs.writeFileSync(paths.pnpmWorkspace, PnpmWorkspaceContent);
-
-    // 2.设置tsconfig.json
+  },
+  updateTsconfig() {
     const [tsconfigContent, setTsconfig] = useFile(paths.tsconfig);
     setTsconfig(
       tsconfigContent
@@ -43,60 +38,54 @@ export async function setRepo(config: Config) {
         )
         .trim(),
     );
-
-    // 3.生成packages目录
+  },
+  newPkg() {
+    execa('npm', ['run', 'pkg:new'], { stdio: 'inherit' });
+  },
+  createPkgsDir() {
     Fs.mkdirSync(paths.pkgs);
+  },
+};
+const multi = {
+  createSrc() {
+    Fs.mkdirSync(paths.src);
+    Fs.writeFileSync(Path.resolve(paths.src, 'index.ts'), `export const test = () => 'test';`);
+  },
+  updatePkg(config: Config) {
+    const [pkgJson, updatePkg] = useFile(rootDir('package.json'), true);
 
-    // 4.设置typedoc.json
-    typedocJson['entryPointStrategy'] = 'packages';
-    updateTypedoc(typedocJson);
-
-    // 5.新增repo
-    await execa('npm', ['run', 'pkg:new'], { stdio: 'inherit' });
-    return;
-  }
-
-  typedocJson['name'] = config.name;
-  updateTypedoc(typedocJson);
-
-  // 生成src目录
-  Fs.mkdirSync(paths.src);
-  Fs.writeFileSync(Path.resolve(paths.src, 'index.ts'), `export const test = () => 'test';`);
-
-  // 更新package.json
-  const [pkgJson, updatePkg] = useFile(rootDir('package.json'), true);
-
-  pkgJson['main'] = `dist/${config.name}.cjs.js`;
-  pkgJson['module'] = `dist/${config.name}.esm-bundler.js`;
-  pkgJson['types'] = `dist/${config.name}.d.ts`;
-  pkgJson['exports'] = {
-    '.': {
-      import: {
-        node: `./dist/${config.name}.cjs.js`,
-        default: `./dist/${config.name}.esm-bundler.js`,
+    pkgJson['main'] = `dist/${config.name}.cjs.js`;
+    pkgJson['module'] = `dist/${config.name}.esm-bundler.js`;
+    pkgJson['types'] = `dist/${config.name}.d.ts`;
+    pkgJson['exports'] = {
+      '.': {
+        import: {
+          node: `./dist/${config.name}.cjs.js`,
+          default: `./dist/${config.name}.esm-bundler.js`,
+        },
+        require: `./dist/${config.name}.cjs.js`,
       },
-      require: `./dist/${config.name}.cjs.js`,
-    },
-  };
-  pkgJson['buildOptions'] = {
-    name: toCamel(pkgJson['name'], '-', true),
-    formats: ['esm-bundler', 'esm-browser', 'cjs', 'global'],
-  };
-  updatePkg(pkgJson);
+    };
+    pkgJson['buildOptions'] = {
+      name: toCamel(pkgJson['name'], '-', true),
+      formats: ['esm-bundler', 'esm-browser', 'cjs', 'global'],
+    };
+    updatePkg(pkgJson);
+  },
+  updateApiExtractor() {
+    const [apiJson, updateApiJson] = useFile(rootDir('api-extractor.json'), true);
 
-  const [apiJson, updateApiJson] = useFile(rootDir('api-extractor.json'), true);
-
-  apiJson['mainEntryPointFilePath'] = './dist/src/index.d.ts';
-  apiJson['dtsRollup'] = {
-    enabled: true,
-    publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
-  };
-  updateApiJson(apiJson);
-
-  // 生成测试文件
-  const testDir = path.resolve(rootDir(), '__tests__');
-  fs.mkdirSync(testDir);
-  const testContent = `
+    apiJson['mainEntryPointFilePath'] = './dist/src/index.d.ts';
+    apiJson['dtsRollup'] = {
+      enabled: true,
+      publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
+    };
+    updateApiJson(apiJson);
+  },
+  createTests(config: Config) {
+    const testDir = path.resolve(rootDir(), '__tests__');
+    fs.mkdirSync(testDir);
+    const testContent = `
 import * as testTarget from '../src';
 
 describe('${config.name}', function () {
@@ -105,5 +94,44 @@ describe('${config.name}', function () {
   });
 });
 `.trim();
-  fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
+    fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
+  },
+};
+
+export async function setRepo(config: Config) {
+  const [typedocJson, updateTypedoc] = useFile(paths.typedoc, true);
+  typedocJson['navigationLinks'].GitHub = config.git.replace(/\.git$/, '');
+  if (config.repoType === RepoType.mono) {
+    // 1.设置pnpm-workspace.yaml
+    mono.createPnpmWorkspace();
+
+    // 2.设置tsconfig.json
+    mono.updateTsconfig();
+
+    // 3.生成packages目录
+    mono.createPkgsDir();
+
+    // 4.设置typedoc.json
+    typedocJson['entryPointStrategy'] = 'packages';
+    updateTypedoc(typedocJson);
+
+    // 5.新增repo
+    mono.newPkg();
+    return;
+  }
+
+  typedocJson['name'] = config.name;
+  updateTypedoc(typedocJson);
+
+  // 生成src目录
+  multi.createSrc();
+
+  // 更新package.json
+  multi.updatePkg(config);
+
+  // 更新api-extractor.json
+  multi.updateApiExtractor();
+
+  // 生成测试文件
+  multi.createTests(config);
 }
