@@ -3,12 +3,45 @@ import chalk from 'chalk';
 import * as fs from 'fs';
 import childProcess from 'child_process';
 
+export function rootDir(path = ''): string {
+  return resolve(__dirname, '../' + path);
+}
+
+export function fuzzyMatchTarget(partialTargets: string[], includeAllMatching: boolean) {
+  const targets = getTargets();
+  const matched: string[] = [];
+  partialTargets.forEach((partialTarget) => {
+    for (const target of targets) {
+      if (target.match(partialTarget)) {
+        matched.push(target);
+        if (!includeAllMatching) {
+          break;
+        }
+      }
+    }
+  });
+  if (matched.length) {
+    return matched;
+  } else {
+    console.log();
+    console.error(
+      `  ${chalk.bgRed.white(' ERROR ')} ${chalk.red(
+        `Target ${chalk.underline(partialTargets)} not found!`,
+      )}`,
+    );
+    console.log();
+
+    process.exit(1);
+  }
+}
+
 export function getTargets(): string[] {
-  return fs.readdirSync(resolve(__dirname, '../packages')).filter((f) => {
-    if (!fs.statSync(resolve(__dirname, `../packages/${f}`)).isDirectory()) {
+  const path = rootDir('packages');
+  return (fs.existsSync(path) ? fs.readdirSync(path) : []).filter((f) => {
+    if (!fs.statSync(rootDir(`packages/${f}`)).isDirectory()) {
       return false;
     }
-    const pkg = require(`../packages/${f}/package.json`);
+    const pkg = require(`${path}/${f}/package.json`);
     return !(pkg.private && !pkg.buildOptions);
   });
 }
