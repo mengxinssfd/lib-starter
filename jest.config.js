@@ -9,9 +9,9 @@ module.exports = {
     },
   },
   collectCoverageFrom: [
-    'pages/**/src/**',
-    '!**/pages/**/dist/**',
-    '!**/pages/**/src/index.ts',
+    'packages/**/src/**',
+    '!**/packages/**/dist/**',
+    '!**/packages/**/src/index.ts',
     // "!packages/**/node_modules",
   ],
   transform: {

@@ -13,7 +13,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "ts-check": "tsc --noEmit && tsc -p ./tsconfig.node.json --noEmit",
     "lint-check": "eslint .",
-    "prettier-check": "prettier pages --check",
+    "prettier-check": "prettier ./ --check",
     "check-all": "run-p ts-check lint-check prettier-check",
     "typedoc:build": "typedoc --plugin @mxssfd/typedoc-theme --theme my-theme",
     "typedoc:deploy": "gh-pages -d docs-html",
@@ -21,7 +21,7 @@
     "release": "esno scripts/release.ts"
   },
   "lint-staged": {
-    "pages/**/*.{js,jsx,ts,tsx,json,html,md}": [
+    "*.{js,jsx,ts,tsx,json,html,md}": [
       "prettier --write",
       "eslint",
       "git add"
