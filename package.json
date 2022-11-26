@@ -1,6 +1,7 @@
 {
   "name": "lib-starter",
   "version": "0.0.0",
+  "packageManager": "pnpm@7.1.0",
   "description": "一个基于pnpm typescript monorepo/multirepo的lib快速启动仓库模板",
   "scripts": {
     "pkg:init": "esno scripts/init-pkg.ts",
