@@ -12,12 +12,13 @@
     "husky-msg-init": "husky add .husky/pre-commit \"npx lint-staged --allow-empty \"$1\"\"&husky add .husky/commit-msg \"npx commitlint --edit \"$1\"\"",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "ts-check": "tsc --noEmit && tsc -p ./tsconfig.node.json --noEmit",
-    "lint-check": "eslint pages",
+    "lint-check": "eslint .",
     "prettier-check": "prettier pages --check",
     "check-all": "run-p ts-check lint-check prettier-check",
     "typedoc:build": "typedoc --plugin @mxssfd/typedoc-theme --theme my-theme",
     "typedoc:deploy": "gh-pages -d docs-html",
-    "build": "esno scripts/build.ts -t"
+    "build": "esno scripts/build.ts -t",
+    "release": "esno scripts/release.ts"
   },
   "lint-staged": {
     "pages/**/*.{js,jsx,ts,tsx,json,html,md}": [

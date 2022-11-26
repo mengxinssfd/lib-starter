@@ -83,3 +83,5 @@ export function useFile<
     },
   ];
 }
+
+export const isMonoRepo = fs.existsSync(rootDir('packages'));

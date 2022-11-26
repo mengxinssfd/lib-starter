@@ -1,13 +1,13 @@
 import * as Path from 'path';
 import chalk from 'chalk';
 import { execa } from 'execa';
-import { getTargets, fuzzyMatchTarget, rootDir } from './utils';
+import { getTargets, fuzzyMatchTarget, rootDir, isMonoRepo } from './utils';
 import Fse from 'fs-extra';
 import minimist from 'minimist';
 import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
 
 const rootPath = rootDir();
-const isMonoRepo = Fse.existsSync(rootDir('packages'));
+
 const allTargets = isMonoRepo ? getTargets() : [rootPath];
 
 const args = minimist(process.argv.slice(2));
