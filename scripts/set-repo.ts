@@ -4,6 +4,8 @@ import { Config, RepoType } from './init-pkg';
 import { execa } from 'execa';
 import { rootDir, useFile } from './utils';
 import { toCamel } from '@mxssfd/core';
+import path from 'path';
+import fs from 'fs';
 
 const PnpmWorkspaceContent = `
 packages:
@@ -32,12 +34,14 @@ export async function setRepo(config: Config) {
     // 2.设置tsconfig.json
     const [tsconfigContent, setTsconfig] = useFile(paths.tsconfig);
     setTsconfig(
-      tsconfigContent.replace(
-        /("include": \[)/,
-        `$1
+      tsconfigContent
+        .replace(
+          /("include": \[)/,
+          `$1
     "packages/*/src",
     "packages/*/__tests__",`,
-      ),
+        )
+        .trim(),
     );
 
     // 3.生成packages目录
@@ -88,4 +92,18 @@ export async function setRepo(config: Config) {
     publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
   };
   updateApiJson(apiJson);
+
+  // 生成测试文件
+  const testDir = path.resolve(rootDir(), '__tests__');
+  fs.mkdirSync(testDir);
+  const testContent = `
+import * as testTarget from '../src';
+
+describe('${config.name}', function () {
+  test('base', () => {
+    expect(1).toBe(1);
+  });
+});
+`.trim();
+  fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
 }

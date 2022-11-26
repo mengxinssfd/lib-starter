@@ -4,16 +4,16 @@ import * as semver from 'semver';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import { setRepo } from './set-repo';
-import { cmdGet, getGitUrl } from './utils';
+import { cmdGet, getGitUrl, rootDir } from './utils';
 
 export enum RepoType {
   mono = 'mono',
   multi = 'multi',
 }
 
-const projectPath = path.resolve(__dirname, '../');
-const pkgPath = path.resolve(projectPath, 'package.json');
-const pkg = require(pkgPath);
+const rootPath = rootDir();
+const rootPkgPath = path.resolve(rootPath, 'package.json');
+const rootPkgJson = require(rootPkgPath);
 
 export interface Config {
   name: string;
@@ -28,13 +28,13 @@ export interface Config {
 
 async function getConfig() {
   const initConfig: Config = {
-    name: path.basename(projectPath),
-    description: pkg.description,
+    name: path.basename(rootPath),
+    description: rootPkgJson.description,
     author: cmdGet('git config user.name'),
-    keywords: pkg.keywords.join(','),
+    keywords: rootPkgJson.keywords.join(','),
     git: getGitUrl(),
     version: '0.0.0',
-    license: pkg.license,
+    license: rootPkgJson.license,
     repoType: RepoType.multi,
   };
 
@@ -121,21 +121,21 @@ async function setup() {
     // 5.获取远程git地址
 
     // 设置项目名称
-    pkg.name = config.name;
+    rootPkgJson.name = config.name;
     // 设置版本号version
-    pkg.version = config.version;
+    rootPkgJson.version = config.version;
     // 设置description
-    pkg.description = config.description;
+    rootPkgJson.description = config.description;
     // 设置keywords
-    pkg.keywords = config.keywords.trim().split(',');
+    rootPkgJson.keywords = config.keywords.trim().split(',');
     // 设置author
-    pkg.author = config.author;
+    rootPkgJson.author = config.author;
     // 设置git
-    pkg.repository.url = 'git+' + config.git;
-    pkg.bugs.url = config.git.replace('.git', '/issues');
-    pkg.homepage = config.git.replace('.git', '#readme');
+    rootPkgJson.repository.url = 'git+' + config.git;
+    rootPkgJson.bugs.url = config.git.replace('.git', '/issues');
+    rootPkgJson.homepage = config.git.replace('.git', '#readme');
 
-    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
+    fs.writeFileSync(rootPkgPath, JSON.stringify(rootPkgJson, null, 2) + '\n');
 
     console.log(chalk.cyan('初始化package.json完成...'));
 

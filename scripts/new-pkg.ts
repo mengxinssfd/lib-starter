@@ -87,13 +87,15 @@ async function getConfig() {
 
   const formatsChoices = ['esm-bundler', 'esm-browser', 'cjs', 'global'];
 
-  ({ formats: config.formats } = await prompt({
-    type: 'multiselect',
-    name: 'formats',
-    message: '选择打包类型(formats)(按空格键选中/取消，enter键确定)',
-    choices: formatsChoices,
-    initial: formatsChoices as any,
-  }));
+  if (!config.private) {
+    ({ formats: config.formats } = await prompt({
+      type: 'multiselect',
+      name: 'formats',
+      message: '选择打包类型(formats)(按空格键选中/取消，enter键确定)',
+      choices: formatsChoices,
+      initial: formatsChoices as any,
+    }));
+  }
 
   console.log('\n');
   step(JSON.stringify(config, null, 2));
@@ -113,31 +115,13 @@ async function getConfig() {
 
 const step = (msg: string) => console.log(chalk.cyan(msg));
 
-async function setup() {
-  try {
-    const config = await getConfig();
-
-    const pkgPath = path.resolve(pkgsPath, config.name);
-
-    // 1.生成pkg目录
-    step('生成pkg目录');
-    if (!fs.existsSync(pkgsPath)) {
-      fs.mkdirSync(pkgsPath);
-    }
-    fs.mkdirSync(pkgPath);
-
-    // 2.生成package.json
-    step('生成package.json');
-
-    const gitUrl = getGitUrl();
-    const gitUrlWithoutGit = gitUrl.replace(/^\.git$/, '');
-
-    // 拼接package.json
-    const pkgContent = `
-{
-  "name": "${config.pkgName}",
-  "version": "${rootPkg.version}",
-  "description": "${config.description}",
+function createPackageJson(pkgPath: string, config: Awaited<ReturnType<typeof getConfig>>) {
+  // 拼接package.json
+  const gitUrl = getGitUrl();
+  const gitUrlWithoutGit = gitUrl.replace(/^\.git$/, '');
+  const buildOptions = config.private
+    ? ''
+    : `
   "main": "dist/${config.name}.cjs.js",
   "module": "dist/${config.name}.esm-bundler.js",
   "types": "dist/${config.name}.d.ts",
@@ -160,6 +144,13 @@ async function setup() {
     "displayName": "${rootPkg.name}/${config.name}",
     "tsconfig": "../../tsconfig.json"
   },
+  `;
+  const pkgContent = `
+{
+  "name": "${config.pkgName}",
+  "version": "${rootPkg.version}",
+  "description": "${config.description}",
+  ${buildOptions}
   "keywords": ${JSON.stringify(config.keywords.split(','))},
   "files": [
     "index.js",
@@ -187,48 +178,81 @@ async function setup() {
   "homepage": "${gitUrlWithoutGit}/tree/master/packages/${config.name}"
 }
   `.trim();
-    console.log(pkgContent);
-    // 写入
-    fs.writeFileSync(
-      path.resolve(pkgPath, 'package.json'),
-      JSON.stringify(JSON.parse(pkgContent), null, 2),
-    );
-
-    // 创建index.js index.mjs
-    step('生成index.js index.mjs');
-    const jsContent = `
-    'use strict';
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports = require('./dist/${config.name}.cjs.prod.js');
-} else {
-  module.exports = require('./dist/${config.name}.cjs.js');
+  console.log(pkgContent);
+  // 写入
+  fs.writeFileSync(
+    path.resolve(pkgPath, 'package.json'),
+    JSON.stringify(JSON.parse(pkgContent), null, 2),
+  );
 }
-    `.trim();
-    fs.writeFileSync(path.resolve(pkgPath, 'index.js'), jsContent);
-    fs.writeFileSync(path.resolve(pkgPath, 'index.mjs'), "export * from './index.js'");
-
-    // 创建api-extractor.json
-    step('生成api-extractor.json');
-    const apiExtContent = {
-      extends: '../../api-extractor.json',
-      mainEntryPointFilePath: './dist/packages/<unscopedPackageName>/src/index.d.ts',
-      dtsRollup: {
-        publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
-      },
-    };
-    fs.writeFileSync(
-      path.resolve(pkgPath, 'api-extractor.json'),
-      JSON.stringify(apiExtContent, null, 2),
-    );
-
-    // 创建README.md
-    step('创建README.md');
-    const mdContent = `
+function createApiExtractorJson(pkgPath: string, config: Awaited<ReturnType<typeof getConfig>>) {
+  if (config.private) return;
+  const apiExtContent = {
+    extends: '../../api-extractor.json',
+    mainEntryPointFilePath: './dist/packages/<unscopedPackageName>/src/index.d.ts',
+    dtsRollup: {
+      publicTrimmedFilePath: './dist/<unscopedPackageName>.d.ts',
+    },
+  };
+  fs.writeFileSync(
+    path.resolve(pkgPath, 'api-extractor.json'),
+    JSON.stringify(apiExtContent, null, 2),
+  );
+}
+function createReadme(pkgPath: string, config: Awaited<ReturnType<typeof getConfig>>) {
+  const mdContent = `
 # ${config.pkgName}  
 ${config.description}
     `.trim();
-    fs.writeFileSync(path.resolve(pkgPath, 'README.md'), mdContent);
+  fs.writeFileSync(path.resolve(pkgPath, 'README.md'), mdContent);
+}
+function createTests(pkgPath: string, config: Awaited<ReturnType<typeof getConfig>>) {
+  const testDir = path.resolve(pkgPath, '__tests__');
+  fs.mkdirSync(testDir);
+  step('添加__tests__/index.test.ts');
+  const testContent = `
+import * as testTarget from '../src';
+
+describe('${config.pkgName}', function () {
+  test('base', () => {
+    expect(1).toBe(1);
+  });
+});
+`.trim();
+  fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
+}
+function updateTypedocJson(config: Awaited<ReturnType<typeof getConfig>>) {
+  if (config.private) return;
+  const [typedocConfig, setFile] = useFile(path.resolve(__dirname, '../typedoc.json'), true);
+  if (!typedocConfig['entryPoints']) typedocConfig['entryPoints'] = [];
+  typedocConfig['entryPoints'].push('packages/' + config.name);
+  setFile(typedocConfig);
+}
+
+async function setup() {
+  try {
+    const config = await getConfig();
+
+    const pkgPath = path.resolve(pkgsPath, config.name);
+
+    // 1.生成pkg目录
+    step('生成pkg目录');
+    if (!fs.existsSync(pkgsPath)) {
+      fs.mkdirSync(pkgsPath);
+    }
+    fs.mkdirSync(pkgPath);
+
+    // 2.生成package.json
+    step('生成package.json');
+    createPackageJson(pkgPath, config);
+
+    // 创建api-extractor.json
+    step('生成api-extractor.json');
+    createApiExtractorJson(pkgPath, config);
+
+    // 创建README.md
+    step('创建README.md');
+    createReadme(pkgPath, config);
 
     // 创建src目录
     step('创建src目录');
@@ -240,28 +264,10 @@ ${config.description}
 
     // 添加__tests__目录
     step('创建__tests__目录');
-    const testDir = path.resolve(pkgPath, '__tests__');
-    fs.mkdirSync(testDir);
-    step('添加__tests__/index.test.ts');
-    const testContent = `
-import * as testTarget from '../src';
+    createTests(pkgPath, config);
 
-describe('${config.pkgName}', function () {
-  test('base', () => {
-    expect(1).toBe(1);
-  });
-});
-`.trim();
-    fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
-
-    step('修改typedoc配置开始');
-
-    const [typedocConfig, setFile] = useFile(path.resolve(__dirname, '../typedoc.json'), true);
-    if (!typedocConfig['entryPoints']) typedocConfig['entryPoints'] = [];
-    typedocConfig['entryPoints'].push('packages/' + config.name);
-    setFile(typedocConfig);
-
-    step('修改typedoc配置完成');
+    step('修改typedoc配置');
+    updateTypedocJson(config);
 
     step('finish');
   } catch (e) {
