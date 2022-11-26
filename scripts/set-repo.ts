@@ -70,6 +70,10 @@ const multi = {
       name: toCamel(pkgJson['name'], '-', true),
       formats: ['esm-bundler', 'esm-browser', 'cjs', 'global'],
     };
+    pkgJson['publishConfig'] = {
+      access: 'public',
+      registry: 'https://registry.npmjs.org/',
+    };
     updatePkg(pkgJson);
   },
   updateApiExtractor() {

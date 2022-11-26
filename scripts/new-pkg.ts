@@ -144,6 +144,10 @@ function createPackageJson(pkgPath: string, config: Awaited<ReturnType<typeof ge
     "displayName": "${rootPkg.name}/${config.name}",
     "tsconfig": "../../tsconfig.json"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   `;
   const pkgContent = `
 {
