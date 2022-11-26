@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-      - run: npm install
+      - run: npx pnpm i
       - run: npm run lint-check
   tests:
     needs: linter
@@ -25,5 +25,5 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16
-      - run: npm install
+      - run: npx pnpm i
       - run: npm run test
