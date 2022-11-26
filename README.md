@@ -65,7 +65,3 @@ npm run pkg:new
 ### 5.更新[`LICENSE`](LICENSE)
 
 [`package.json`](package.json)里面有`license`, 根目录下也有个文件[`LICENSE`](LICENSE)需要更新。
-
-```
-
-```
