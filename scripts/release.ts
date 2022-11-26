@@ -5,7 +5,7 @@ import { execa } from 'execa';
 import * as semver from 'semver';
 import chalk from 'chalk';
 import { ReleaseType } from 'semver';
-import { isMonoRepo } from './utils';
+import { isMonoRepo, rootDir } from './utils';
 
 const rootPkgJson = require('../package.json');
 const args = require('minimist')(process.argv.slice(2));
@@ -57,9 +57,7 @@ const actions = {
     updatePackage(path.resolve(__dirname, `../package.json`), version);
   },
   async release(config: Config) {
-    async function publishPkg(pkg: string) {
-      if (config.skippedPackages.includes(pkg)) return;
-      const pkgPath = getPkgPath(pkg);
+    async function publishPkg(pkgPath: string) {
       const json = JSON.parse(fs.readFileSync(path.resolve(pkgPath, 'package.json'), 'utf-8'));
       if (json.private) return;
 
@@ -86,9 +84,12 @@ const actions = {
         }
       }
     }
-    for (const pkg of config.pkgs) {
-      await publishPkg(pkg);
-    }
+    if (isMonoRepo)
+      for (const pkg of config.pkgs) {
+        if (config.skippedPackages.includes(pkg)) continue;
+        await publishPkg(getPkgPath(pkg));
+      }
+    else await publishPkg(rootDir());
   },
   genChangeLog: () => exec(npmTool, ['changelog']),
   async gitCommit(targetVersion: string) {
@@ -147,8 +148,17 @@ async function getVersion(preId: string, currentVersion: string) {
       name: 'release',
       message: '选择发布版本',
       choices: versionIncrements
-        .map<{ message: string; name: string }>((i) => ({ message: i, name: inc(i)! }))
-        .concat([{ message: `custom cur(${currentVersion})`, name: 'custom' }]),
+        .map<{ message: string; name: string; hint: string }>((i) => {
+          const version = inc(i) as string;
+          return {
+            message: i,
+            name: version,
+            hint: version,
+          };
+        })
+        .concat([
+          { message: `custom cur(${currentVersion})`, name: 'custom', hint: currentVersion },
+        ]),
     },
   ]);
   if (release === 'custom') {
