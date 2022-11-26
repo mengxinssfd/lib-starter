@@ -8,7 +8,7 @@
     "check-deps": "ncu",
     "test": "jest",
     "cov": "jest --coverage",
-    "prepare": "husky install",
+    "prepare": "husky install && npm run pkg:init",
     "husky-msg-init": "husky add .husky/pre-commit \"npx lint-staged --allow-empty \"$1\"\"&husky add .husky/commit-msg \"npx commitlint --edit \"$1\"\"",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "ts-check": "tsc --noEmit && tsc -p ./tsconfig.node.json --noEmit",
