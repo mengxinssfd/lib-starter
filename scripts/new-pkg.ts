@@ -148,6 +148,12 @@ async function setup() {
     "./": "./dist"
   },
   "types": "dist/${config.name}.d.ts",
+  "typedoc": {
+    "entryPoint": "./src/index.ts",
+    "readmeFile": "./README.md",
+    "displayName": "${rootPkg.name}/${config.name}",
+    "tsconfig": "../../tsconfig.json"
+  },
   "keywords": ${JSON.stringify(config.keywords.split(','))},
   "files": [
     "index.js",
