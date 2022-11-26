@@ -35,19 +35,6 @@ const outputConfigs = {
     file: resolve(`dist/${name}.global.js`),
     format: `iife`,
   },
-  // runtime-only builds, for main "vue" package only
-  'esm-bundler-runtime': {
-    file: resolve(`dist/${name}.runtime.esm-bundler.js`),
-    format: `es`,
-  },
-  'esm-browser-runtime': {
-    file: resolve(`dist/${name}.runtime.esm-browser.js`),
-    format: 'es',
-  },
-  'global-runtime': {
-    file: resolve(`dist/${name}.runtime.global.js`),
-    format: 'iife',
-  },
 };
 
 const defaultFormats = ['esm-bundler', 'cjs'];
@@ -79,14 +66,9 @@ function createConfig(format, output, plugins = []) {
     process.exit(1);
   }
 
-  const isBundlerESMBuild = /esm-bundler/.test(format);
-  const isBrowserESMBuild = /esm-browser/.test(format);
-  const isServerRenderer = name === 'server-renderer';
   const isNodeBuild = format === 'cjs';
   const isGlobalBuild = /global/.test(format);
-  const isCompatPackage = pkg.name === '@vue/compat';
 
-  output.exports = isCompatPackage ? 'auto' : 'named';
   output.sourcemap = !!process.env.SOURCE_MAP;
   output.externalLiveBindings = false;
 
@@ -111,7 +93,7 @@ function createConfig(format, output, plugins = []) {
     cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
     tsconfigOverride: {
       compilerOptions: {
-        target: isServerRenderer || isNodeBuild || output.format === 'es' ? 'es2019' : 'es2015',
+        target: isNodeBuild || output.format === 'es' ? 'es2019' : 'es2015',
         sourceMap: output.sourcemap,
         declaration: shouldEmitDeclarations,
         declarationMap: shouldEmitDeclarations,
@@ -126,30 +108,10 @@ function createConfig(format, output, plugins = []) {
 
   let entryFile = /runtime$/.test(format) ? `src/runtime.ts` : `src/index.ts`;
 
-  // the compat build needs both default AND named exports. This will cause
-  // Rollup to complain for non-ESM targets, so we use separate entries for
-  // esm vs. non-esm builds.
-  if (isCompatPackage && (isBrowserESMBuild || isBundlerESMBuild)) {
-    entryFile = /runtime$/.test(format) ? `src/esm-runtime.ts` : `src/esm-index.ts`;
-  }
-
-  let external = [];
-
-  if (isGlobalBuild || isBrowserESMBuild || isCompatPackage) {
-    if (!packageOptions.enableNonBrowserBranches) {
-      // normal browser builds - non-browser only imports are tree-shaken,
-      // they are only listed here to suppress warnings.
-      external = ['source-map', '@babel/parser', 'estree-walker'];
-    }
-  } else {
-    // Node / esm-bundler builds.
-    // externalize all direct deps unless it's the compat build.
-    external = [
-      ...Object.keys(pkg.dependencies || {}),
-      ...Object.keys(pkg.peerDependencies || {}),
-      ...['path', 'url', 'stream'], // for @vue/compiler-sfc / server-renderer
-    ];
-  }
+  const external = [
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+  ];
 
   return {
     input: resolve(entryFile),
