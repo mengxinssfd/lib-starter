@@ -1,11 +1,8 @@
-import * as Path from 'path';
 import * as Fs from 'fs';
 import { Config, RepoType } from './init-pkg';
 import { execa } from 'execa';
-import { rootDir, useFile } from './utils';
+import { createSrcAndTests, rootDir, useFile } from './utils';
 import { toCamel } from '@mxssfd/core';
-import path from 'path';
-import fs from 'fs';
 
 const paths = {
   typedoc: rootDir('typedoc.json'),
@@ -47,10 +44,6 @@ packages:
   },
 };
 const multi = {
-  createSrc() {
-    Fs.mkdirSync(paths.src);
-    Fs.writeFileSync(Path.resolve(paths.src, 'index.ts'), `export const test = () => 'test';`);
-  },
   updatePkg(config: Config) {
     const [pkgJson, updatePkg] = useFile(rootDir('package.json'), true);
 
@@ -86,20 +79,6 @@ const multi = {
     };
     updateApiJson(apiJson);
   },
-  createTests(config: Config) {
-    const testDir = path.resolve(rootDir(), '__tests__');
-    fs.mkdirSync(testDir);
-    const testContent = `
-import * as testTarget from '../src';
-
-describe('${config.name}', function () {
-  test('base', () => {
-    expect(1).toBe(1);
-  });
-});
-`.trim();
-    fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
-  },
 };
 
 export async function setRepo(config: Config) {
@@ -127,15 +106,12 @@ export async function setRepo(config: Config) {
   typedocJson['name'] = config.name;
   updateTypedoc(typedocJson);
 
-  // 生成src目录
-  multi.createSrc();
-
   // 更新package.json
   multi.updatePkg(config);
 
   // 更新api-extractor.json
   multi.updateApiExtractor();
 
-  // 生成测试文件
-  multi.createTests(config);
+  // 生成src、测试目录及其文件
+  createSrcAndTests(rootDir(), config.name);
 }

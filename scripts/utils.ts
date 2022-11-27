@@ -1,6 +1,6 @@
 import { resolve, basename } from 'path';
 import chalk from 'chalk';
-import * as fs from 'fs';
+import * as Fs from 'fs';
 const childProcess = require('child_process');
 
 export function rootDir(path = ''): string {
@@ -37,8 +37,8 @@ export function fuzzyMatchTarget(partialTargets: string[], includeAllMatching: b
 
 export function getTargets(): string[] {
   const path = rootDir('packages');
-  return (fs.existsSync(path) ? fs.readdirSync(path) : []).filter((f) => {
-    if (!fs.statSync(rootDir(`packages/${f}`)).isDirectory()) {
+  return (Fs.existsSync(path) ? Fs.readdirSync(path) : []).filter((f) => {
+    if (!Fs.statSync(rootDir(`packages/${f}`)).isDirectory()) {
       return false;
     }
     const pkg = require(`${path}/${f}/package.json`);
@@ -46,10 +46,10 @@ export function getTargets(): string[] {
   });
 }
 export function checkFileSize(filePath: string) {
-  if (!fs.existsSync(filePath)) {
+  if (!Fs.existsSync(filePath)) {
     return;
   }
-  const file = fs.readFileSync(filePath);
+  const file = Fs.readFileSync(filePath);
   const minSize = (file.length / 1024).toFixed(2) + 'kb';
   console.log(`${chalk.gray(chalk.bold(basename(filePath)))} min:${minSize}`);
 }
@@ -70,7 +70,7 @@ export function useFile<
   P extends boolean = false,
   C = P extends true ? Record<string, any> : string,
 >(path: string, parseJson = false as P): [C, (content: C) => void] {
-  let _content: string | Record<string, any> | null = fs.readFileSync(path).toString();
+  let _content: string | Record<string, any> | null = Fs.readFileSync(path).toString();
   if (parseJson) _content = JSON.parse(_content);
 
   return [
@@ -79,9 +79,31 @@ export function useFile<
       _content = null;
       let result = content as string;
       if (parseJson) result = JSON.stringify(content, null, 2);
-      fs.writeFileSync(path, result + '\n');
+      Fs.writeFileSync(path, result + '\n');
     },
   ];
 }
 
-export const isMonoRepo = fs.existsSync(rootDir('packages'));
+export const isMonoRepo = Fs.existsSync(rootDir('packages'));
+
+export function createSrcAndTests(pkgPath: string, pkgName: string) {
+  const srcPath = resolve(pkgPath, 'src');
+  // 创建src目录
+  Fs.mkdirSync(srcPath);
+  // 创建src/index.ts
+  Fs.writeFileSync(resolve(srcPath, 'index.ts'), `export const test = () => 'test';\n`);
+
+  const testsPath = resolve(pkgPath, '__tests__');
+  // 创建__tests__目录
+  Fs.mkdirSync(testsPath);
+  // 创建__tests__/index.test.ts文件
+  const testContent = `import * as testTarget from '../src';
+
+describe('${pkgName}', function () {
+  test('base', () => {
+    expect(testTarget.test()).toBe('test');
+  });
+});
+`;
+  Fs.writeFileSync(resolve(testsPath, 'index.test.ts'), testContent);
+}

@@ -3,7 +3,7 @@ import { prompt } from 'enquirer';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as tsUtils from '@mxssfd/core';
-import { getGitUrl, useFile } from './utils';
+import { createSrcAndTests, getGitUrl, useFile } from './utils';
 import rootPkg from '../package.json';
 
 const pkgsPath = path.resolve(__dirname, '../packages');
@@ -210,21 +210,7 @@ ${config.description}
     `.trim();
   fs.writeFileSync(path.resolve(pkgPath, 'README.md'), mdContent);
 }
-function createTests(pkgPath: string, config: Awaited<ReturnType<typeof getConfig>>) {
-  const testDir = path.resolve(pkgPath, '__tests__');
-  fs.mkdirSync(testDir);
-  step('添加__tests__/index.test.ts');
-  const testContent = `
-import * as testTarget from '../src';
 
-describe('${config.pkgName}', function () {
-  test('base', () => {
-    expect(1).toBe(1);
-  });
-});
-`.trim();
-  fs.writeFileSync(path.resolve(testDir, 'index.test.ts'), testContent);
-}
 function updateTypedocJson(config: Awaited<ReturnType<typeof getConfig>>) {
   if (config.private) return;
   const [typedocConfig, setFile] = useFile(path.resolve(__dirname, '../typedoc.json'), true);
@@ -258,17 +244,9 @@ async function setup() {
     step('创建README.md');
     createReadme(pkgPath, config);
 
-    // 创建src目录
-    step('创建src目录');
-    fs.mkdirSync(path.resolve(pkgPath, 'src'));
-
-    // 添加src/index.ts文件
-    step('创建src/index.ts文件');
-    fs.writeFileSync(path.resolve(pkgPath, 'src/index.ts'), '');
-
-    // 添加__tests__目录
-    step('创建__tests__目录');
-    createTests(pkgPath, config);
+    // 创建src目录并添加__tests__目录
+    step('创建src目录并添加__tests__目录');
+    createSrcAndTests(pkgPath, config.pkgName);
 
     step('修改typedoc配置');
     updateTypedocJson(config);
