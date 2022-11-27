@@ -104,6 +104,7 @@ export async function setRepo(config: Config) {
   }
 
   typedocJson['name'] = config.name;
+  typedocJson['entryPoints'] = ['src/index.ts'];
   updateTypedoc(typedocJson);
 
   // 更新package.json
