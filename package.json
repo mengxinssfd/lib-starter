@@ -22,7 +22,7 @@
     "release": "esno scripts/release.ts"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,json,html,md}": [
+    "*.{js,jsx,ts,tsx,json,html,md,yaml}": [
       "prettier --write",
       "eslint",
       "git add"
