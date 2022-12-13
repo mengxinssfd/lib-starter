@@ -2,7 +2,7 @@ import * as Fs from 'fs';
 import { Config, RepoType } from './init-pkg';
 import { execa } from 'execa';
 import { createSrcAndTests, rootDir, useFile } from './utils';
-import { toCamel } from '@mxssfd/core';
+import { toCamel } from '@tool-pack/basic';
 
 const paths = {
   typedoc: rootDir('typedoc.json'),
