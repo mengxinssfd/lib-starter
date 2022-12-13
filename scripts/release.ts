@@ -146,7 +146,7 @@ async function getVersion(preId: string, currentVersion: string) {
     {
       type: 'select',
       name: 'release',
-      message: '选择发布版本',
+      message: `选择发布版本(当前v${rootPkgJson.version})`,
       choices: versionIncrements
         .map<{ message: string; name: string; hint: string }>((i) => {
           const version = inc(i) as string;
