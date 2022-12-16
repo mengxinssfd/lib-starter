@@ -6,7 +6,7 @@ specifiers:
   '@microsoft/api-extractor': ^7.33.6
   '@mxssfd/typedoc-theme': ^1.0.3
   '@rollup/plugin-json': ^5.0.1
-  '@tool-pack/basic': ^0.0.1-beta.0
+  '@tool-pack/basic': ^0.0.3
   '@types/fs-extra': ^9.0.13
   '@types/jest': ^29.2.3
   '@types/minimist': ^1.2.2
@@ -50,7 +50,7 @@ devDependencies:
   '@microsoft/api-extractor': 7.33.6
   '@mxssfd/typedoc-theme': 1.0.3_typedoc@0.23.21
   '@rollup/plugin-json': 5.0.1_rollup@3.4.0
-  '@tool-pack/basic': 0.0.1-beta.0
+  '@tool-pack/basic': 0.0.3
   '@types/fs-extra': 9.0.13
   '@types/jest': 29.2.3
   '@types/minimist': 1.2.2
@@ -1230,8 +1230,8 @@ packages:
       defer-to-connect: 2.0.1
     dev: true
 
-  /@tool-pack/basic/0.0.1-beta.0:
-    resolution: {integrity: sha512-VAUlQW4NGXxeFrtFGCtw0hfo5QZGDR2EEnXAvIEtRTXVkeJpCKrl27MrO/aQ27th9ywB7uSDZc/mRDFppIkTEg==}
+  /@tool-pack/basic/0.0.3:
+    resolution: {integrity: sha512-zLOqCMVywCNTFbroLgs9dEN7uwoJVicW6AupY/0MMkRsEeUW/bFgOWD0BaJftnNpd0o8oUpRBKvKPMuKRgc+5Q==}
     dependencies:
       '@tool-pack/types': 0.0.1
     dev: true
