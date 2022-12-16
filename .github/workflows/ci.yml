@@ -24,6 +24,7 @@ jobs:
           node-version: 18
           cache: 'pnpm'
       - run: pnpm install
+      - run: npm run init-lib-starter-ci
       - run: npm run check:all
   tests:
     needs: linter
@@ -40,4 +41,5 @@ jobs:
           node-version: 18
           cache: 'pnpm'
       - run: pnpm install
+      - run: npm run init-lib-starter-ci
       - run: npm run test
