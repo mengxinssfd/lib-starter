@@ -144,9 +144,10 @@ async function setup() {
     rootPkgJson.bugs.url = config.git.replace('.git', '/issues');
     rootPkgJson.homepage = config.git.replace('.git', '#readme');
 
+    const LibStarterName = 'lib-starter';
     // 移除lib-starter相关的scripts
     for (const key in rootPkgJson.scripts) {
-      if (key.startsWith(rootPkgJson.name)) delete rootPkgJson.scripts[key];
+      if (key.startsWith(LibStarterName)) delete rootPkgJson.scripts[key];
     }
 
     fs.writeFileSync(rootPkgPath, JSON.stringify(rootPkgJson, null, 2) + '\n');
@@ -159,7 +160,7 @@ async function setup() {
 
     // 移除lib-starter的ci
     const [ci, updateCi] = useFile(path.resolve(__dirname, '../.github/workflows/ci.yml'));
-    updateCi(ci.replace(/\s*- run: npm run lib-starter.+\n/g, '\n'));
+    updateCi(ci.replace(new RegExp(`\\s*- run: npm run ${LibStarterName}.+\n`, 'g'), '\n'));
 
     // 移除lib-starter相关scripts
     const scriptsPath = path.resolve(__dirname, '../scripts');
@@ -167,7 +168,7 @@ async function setup() {
     scripts.forEach((script) => {
       const filename = path.basename(script);
       const filepath = path.resolve(scriptsPath, script);
-      if (filename.startsWith(rootPkgJson.name)) fs.rmSync(filepath);
+      if (filename.startsWith(LibStarterName)) fs.rmSync(filepath);
     });
   } catch (e) {
     console.log(e);
