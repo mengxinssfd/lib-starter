@@ -2,7 +2,7 @@ import * as path from 'path';
 import { prompt } from 'enquirer';
 import chalk from 'chalk';
 import * as fs from 'fs';
-import * as tsUtils from '@mxssfd/core';
+import { toCamel } from '@tool-pack/basic';
 import { createSrcAndTests, getGitUrl, useFile } from './utils';
 import rootPkg from '../package.json';
 
@@ -45,7 +45,7 @@ async function getConfig() {
       type: 'input',
       name: 'umdName',
       message: '全局umd名(umdName)',
-      initial: tsUtils.toCamel(rootPkg.name, '-') + tsUtils.toCamel(config.name, '-', true),
+      initial: toCamel(rootPkg.name, '-') + toCamel(config.name, '-', true),
       required: true,
     },
     {
