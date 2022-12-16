@@ -2,6 +2,9 @@ const path = require('path');
 const fs = require('fs');
 const ts = require('rollup-plugin-typescript2');
 const json = require('@rollup/plugin-json');
+const commonJS = require('@rollup/plugin-commonjs');
+const polyfillNode = require('rollup-plugin-polyfill-node');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
 
 if (!process.env.TARGET) {
   throw new Error('TARGET package must be specified via --environment flag.');
@@ -113,16 +116,20 @@ function createConfig(format, output, plugins = []) {
     ...Object.keys(pkg.peerDependencies || {}),
   ];
 
+  const nodePlugins =
+    format === 'global' ? [commonJS({ sourceMap: false }), polyfillNode(), nodeResolve()] : [];
+
   return {
     input: resolve(entryFile),
     // Global and Browser ESM builds inlines everything so that they can be
     // used alone.
-    external,
+    external: format === 'global' ? [] : external,
     plugins: [
       json({
         namedExports: false,
       }),
       tsPlugin,
+      ...nodePlugins,
       ...plugins,
     ],
     output,
