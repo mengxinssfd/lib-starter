@@ -4,7 +4,7 @@ import * as semver from 'semver';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import { setRepo } from './set-repo';
-import { cmdGet, getGitUrl, rootDir } from './utils';
+import { cmdGet, getGitUrl, rootDir, useFile } from './utils';
 
 export enum RepoType {
   mono = 'mono',
@@ -144,6 +144,11 @@ async function setup() {
     rootPkgJson.bugs.url = config.git.replace('.git', '/issues');
     rootPkgJson.homepage = config.git.replace('.git', '#readme');
 
+    // 移除lib-starter相关的scripts
+    for (const key in rootPkgJson.scripts) {
+      if (key.startsWith(rootPkgJson.name)) delete rootPkgJson.scripts[key];
+    }
+
     fs.writeFileSync(rootPkgPath, JSON.stringify(rootPkgJson, null, 2) + '\n');
 
     console.log(chalk.cyan('初始化package.json完成...'));
@@ -151,6 +156,19 @@ async function setup() {
     console.log(chalk.cyan('初始化repo开始...'));
     setRepo(config);
     console.log(chalk.cyan('初始化repo完成...'));
+
+    // 移除lib-starter的ci
+    const [ci, updateCi] = useFile(path.resolve(__dirname, '../.github/workflows/ci.yml'));
+    updateCi(ci.replace(/\s*- run: npm run lib-starter.+\n/g, '\n'));
+
+    // 移除lib-starter相关scripts
+    const scriptsPath = path.resolve(__dirname, '../scripts');
+    const scripts = fs.readdirSync(scriptsPath);
+    scripts.forEach((script) => {
+      const filename = path.basename(script);
+      const filepath = path.resolve(scriptsPath, script);
+      if (filename.startsWith(rootPkgJson.name)) fs.rmSync(filepath);
+    });
   } catch (e) {
     console.log(e);
   }

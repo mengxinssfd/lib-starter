@@ -89,13 +89,13 @@ export const isMonoRepo = Fs.existsSync(rootDir('packages'));
 export function createSrcAndTests(pkgPath: string, pkgName: string) {
   const srcPath = resolve(pkgPath, 'src');
   // 创建src目录
-  Fs.mkdirSync(srcPath);
+  if (!Fs.existsSync(srcPath)) Fs.mkdirSync(srcPath);
   // 创建src/index.ts
   Fs.writeFileSync(resolve(srcPath, 'index.ts'), `export const test = () => 'test';\n`);
 
   const testsPath = resolve(pkgPath, '__tests__');
   // 创建__tests__目录
-  Fs.mkdirSync(testsPath);
+  if (!Fs.existsSync(testsPath)) Fs.mkdirSync(testsPath);
   // 创建__tests__/index.test.ts文件
   const testContent = `import * as testTarget from '../src';
 

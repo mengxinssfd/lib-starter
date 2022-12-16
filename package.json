@@ -4,9 +4,9 @@
   "packageManager": "pnpm@7.1.0",
   "description": "一个基于pnpm typescript monorepo/multirepo的lib快速启动仓库模板",
   "scripts": {
-    "init-lib-starter-ci": "esno scripts/init-lib-starter-ci.ts",
-    "pkg:init": "esno scripts/init-pkg.ts",
-    "pkg:new": "esno scripts/new-pkg.ts",
+    "lib-starter:init-ci": "esno scripts/lib-starter-init-ci.ts",
+    "pkg:init": "esno scripts/pkg-init.ts",
+    "pkg:new": "esno scripts/pkg-new.ts",
     "test": "jest",
     "test:cov": "jest --coverage",
     "prepare": "husky install && npm run pkg:init",
