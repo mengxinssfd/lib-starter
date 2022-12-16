@@ -29,7 +29,7 @@ const exec = (
 
 const getPkgPath = (pkg: string) => path.resolve(__dirname, `../packages/${pkg}`);
 const actions = {
-  lintCheck: () => exec(npmTool, ['lint-check']),
+  lintCheck: () => exec(npmTool, ['check:eslint']),
   jestCheck: () => exec(bin('jest'), ['--no-cache']),
   build: () => exec(npmTool, ['build']),
   updateVersions(pkgs: string[], version: string) {
