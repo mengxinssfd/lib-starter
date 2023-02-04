@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: npm run lib-starter:init-ci
       - run: npm run check:all
   tests:
@@ -40,6 +40,6 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: npm run lib-starter:init-ci
       - run: npm run test
