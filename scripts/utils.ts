@@ -87,23 +87,29 @@ export function useFile<
 export const isMonoRepo = Fs.existsSync(rootDir('packages'));
 
 export function createSrcAndTests(pkgPath: string, pkgName: string) {
-  const srcPath = resolve(pkgPath, 'src');
-  // 创建src目录
-  if (!Fs.existsSync(srcPath)) Fs.mkdirSync(srcPath);
-  // 创建src/index.ts
-  Fs.writeFileSync(resolve(srcPath, 'index.ts'), `export const test = () => 'test';\n`);
-
-  const testsPath = resolve(pkgPath, '__tests__');
-  // 创建__tests__目录
-  if (!Fs.existsSync(testsPath)) Fs.mkdirSync(testsPath);
-  // 创建__tests__/index.test.ts文件
-  const testContent = `import * as testTarget from '../src';
+  const files = [
+    // 创建src/index.ts
+    {
+      dir: resolve(pkgPath, 'src'),
+      filename: 'index.ts',
+      content: `export const test = () => 'test';\n`,
+    },
+    // 创建__tests__/index.test.ts文件
+    {
+      dir: resolve(pkgPath, '__tests__'),
+      filename: 'index.test.ts',
+      content: `import * as testTarget from '../src';
 
 describe('${pkgName}', function () {
   test('base', () => {
     expect(testTarget.test()).toBe('test');
   });
 });
-`;
-  Fs.writeFileSync(resolve(testsPath, 'index.test.ts'), testContent);
+`,
+    },
+  ];
+  files.forEach((file) => {
+    if (!Fs.existsSync(file.dir)) Fs.mkdirSync(file.dir);
+    Fs.writeFileSync(resolve(file.dir, file.filename), file.content);
+  });
 }
