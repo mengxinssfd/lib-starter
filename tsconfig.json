@@ -10,12 +10,13 @@
     "sourceMap": true,
     "allowJs": true,
     // "jsx": "react",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     // "removeComments": true,
     //    "rootDir": "src",
     "forceConsistentCasingInFileNames": false,
     "importHelpers": true,
-    "suppressImplicitAnyIndexErrors": true,
+    // "suppressImplicitAnyIndexErrors": true, // ts5.0已弃用
+    "verbatimModuleSyntax": true, // 单独导出或导入ts类型且不使用type关键字时，tsc报错
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "strict": true,
