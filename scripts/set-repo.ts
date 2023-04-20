@@ -1,5 +1,5 @@
 import * as Fs from 'fs';
-import { Config, RepoType } from './pkg-init';
+import { type Config, RepoType } from './pkg-init';
 import { execa } from 'execa';
 import { createSrcAndTests, rootDir, useFile } from './utils';
 import { toCamel } from '@tool-pack/basic';
