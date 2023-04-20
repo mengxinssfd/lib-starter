@@ -23,7 +23,6 @@ specifiers:
   eslint: ^8.38.0
   eslint-config-prettier: ^8.8.0
   eslint-plugin-prettier: ^4.2.1
-  esno: ^0.16.3
   execa: ^7.1.1
   fs-extra: ^11.1.1
   gh-pages: ^5.0.0
@@ -44,6 +43,7 @@ specifiers:
   semver: ^7.5.0
   ts-jest: ^29.1.0
   tslib: ^2.5.0
+  tsx: ^3.12.6
   typedoc: ^0.24.4
   typescript: ^5.0.4
 
@@ -70,7 +70,6 @@ devDependencies:
   eslint: 8.38.0
   eslint-config-prettier: 8.8.0_eslint@8.38.0
   eslint-plugin-prettier: 4.2.1_mrzcadguhkbme6yx3ehduvsjxu
-  esno: 0.16.3
   execa: 7.1.1
   fs-extra: 11.1.1
   gh-pages: 5.0.0
@@ -91,6 +90,7 @@ devDependencies:
   semver: 7.5.0
   ts-jest: 29.1.0_tobmchb5uviuq5lwsinkw5fvje
   tslib: 2.5.0
+  tsx: 3.12.6
   typedoc: 0.24.4_typescript@5.0.4
   typescript: 5.0.4
 
@@ -3215,13 +3215,6 @@ packages:
       text-table: 0.2.0
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /esno/0.16.3:
-    resolution: {integrity: sha512-6slSBEV1lMKcX13DBifvnDFpNno5WXhw4j/ff7RI0y51BZiDqEe5dNhhjhIQ3iCOQuzsm2MbVzmwqbN78BBhPg==}
-    hasBin: true
-    dependencies:
-      tsx: 3.12.6
     dev: true
 
   /espree/9.5.1:
