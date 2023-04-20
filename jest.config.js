@@ -16,7 +16,11 @@ module.exports = {
     // "!packages/**/node_modules",
   ],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      // 解决ts5报错 https://github.com/kulshekhar/ts-jest/issues/4081
+      { tsconfig: './tsconfig.jest.json' },
+    ],
   },
   testRegex: '(/__tests__/.*\\.(test|spec))\\.(jsx?|tsx?)$',
   // moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
