@@ -2,7 +2,7 @@ import * as Fs from 'fs';
 import { type Config, RepoType } from './pkg-init';
 import { execa } from 'execa';
 import { createSrcAndTests, rootDir, useFile } from './utils';
-import { toCamel } from '@tool-pack/basic';
+import { capitalize } from '@tool-pack/basic';
 
 const paths = {
   typedoc: rootDir('typedoc.json'),
@@ -60,7 +60,7 @@ const multi = {
       },
     };
     pkgJson['buildOptions'] = {
-      name: toCamel(pkgJson['name'], '-', true),
+      name: capitalize(pkgJson['name']),
       formats: ['esm-bundler', 'esm-browser', 'cjs', 'global'],
     };
     pkgJson['publishConfig'] = {

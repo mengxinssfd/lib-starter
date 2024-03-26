@@ -2,7 +2,7 @@ import * as path from 'path';
 import { prompt } from 'enquirer';
 import chalk from 'chalk';
 import * as fs from 'fs';
-import { toCamel } from '@tool-pack/basic';
+import { camelCase, capitalize } from '@tool-pack/basic';
 import { createSrcAndTests, getGitUrl, useFile } from './utils';
 import rootPkg from '../package.json';
 
@@ -45,7 +45,7 @@ async function getConfig() {
       type: 'input',
       name: 'umdName',
       message: '全局umd名(umdName)',
-      initial: toCamel(rootPkg.name, '-') + toCamel(config.name, '-', true),
+      initial: camelCase(rootPkg.name) + capitalize(config.name),
       required: true,
     },
     {
@@ -169,10 +169,13 @@ function createPackageJson(pkgPath: string, config: Awaited<ReturnType<typeof ge
     "apie": "api-extractor run"
   },
   "dependencies": ${JSON.stringify(
-    config.deps.reduce((prev, cur) => {
-      prev[`@${rootPkg.name}/${cur}`] = rootPkg.version;
-      return prev;
-    }, {} as Record<string, string>),
+    config.deps.reduce(
+      (prev, cur) => {
+        prev[`@${rootPkg.name}/${cur}`] = rootPkg.version;
+        return prev;
+      },
+      {} as Record<string, string>,
+    ),
   )},
   "author": "dyh",
   "license": "MIT",
