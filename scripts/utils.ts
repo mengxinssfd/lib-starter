@@ -1,4 +1,4 @@
-import { resolve, basename } from 'path';
+import { basename, resolve } from 'path';
 import chalk from 'chalk';
 import * as Fs from 'fs';
 const childProcess = require('child_process');
@@ -57,7 +57,7 @@ export function checkFileSize(filePath: string) {
 export function cmdGet(cmd: string) {
   try {
     return childProcess.execSync(cmd).toString().trim();
-  } catch (e) {
+  } catch {
     return '';
   }
 }
@@ -69,8 +69,8 @@ export function getGitUrl(): string {
 export function useFile<
   P extends boolean = false,
   C = P extends true ? Record<string, any> : string,
->(path: string, parseJson = false as P): [C, (content: C) => void] {
-  let _content: string | Record<string, any> | null = Fs.readFileSync(path).toString();
+>(path: string, parseJson = false as P): [content: C, setContent: (content: C) => void] {
+  let _content: Record<string, any> | string | null = Fs.readFileSync(path).toString();
   if (parseJson) _content = JSON.parse(_content);
 
   return [
@@ -90,14 +90,12 @@ export function createSrcAndTests(pkgPath: string, pkgName: string) {
   const files = [
     // 创建src/index.ts
     {
+      content: `export const test = () => 'test';\n`,
       dir: resolve(pkgPath, 'src'),
       filename: 'index.ts',
-      content: `export const test = () => 'test';\n`,
     },
     // 创建__tests__/index.test.ts文件
     {
-      dir: resolve(pkgPath, '__tests__'),
-      filename: 'index.test.ts',
       content: `import * as testTarget from '../src';
 
 describe('${pkgName}', function () {
@@ -106,6 +104,8 @@ describe('${pkgName}', function () {
   });
 });
 `,
+      dir: resolve(pkgPath, '__tests__'),
+      filename: 'index.test.ts',
     },
   ];
   files.forEach((file) => {

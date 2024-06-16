@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 module.exports = {
   testEnvironment: 'jsdom',
   coverageThreshold: {
