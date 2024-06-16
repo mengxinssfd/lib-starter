@@ -1,10 +1,10 @@
-import * as Path from 'path';
-import chalk from 'chalk';
-import { execa } from 'execa';
-import { getTargets, fuzzyMatchTarget, rootDir, isMonoRepo } from './utils';
-import Fse from 'fs-extra';
+import { fuzzyMatchTarget, getTargets, isMonoRepo, rootDir } from './utils';
+import { ExtractorConfig, Extractor } from '@microsoft/api-extractor';
 import minimist from 'minimist';
-import { Extractor, ExtractorConfig } from '@microsoft/api-extractor';
+import { execa } from 'execa';
+import * as Path from 'path';
+import Fse from 'fs-extra';
+import chalk from 'chalk';
 
 const rootPath = rootDir();
 
@@ -80,8 +80,8 @@ async function buildType(target: string, pkgDirPath: string, pkgJson: Record<str
   const extractorConfigPath = Path.resolve(pkgDirPath, `api-extractor.json`);
   const extractorConfig = ExtractorConfig.loadFileAndPrepare(extractorConfigPath);
   const extractorResult = Extractor.invoke(extractorConfig, {
-    localBuild: true,
     showVerboseMessages: true,
+    localBuild: true,
   });
 
   if (extractorResult.succeeded) {
