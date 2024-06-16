@@ -1,7 +1,7 @@
 {
   "name": "lib-starter",
   "version": "0.0.0",
-  "packageManager": "pnpm@7.1.0",
+  "packageManager": "pnpm@9.3.0",
   "description": "一个基于pnpm typescript monorepo/multirepo的lib快速启动仓库模板",
   "scripts": {
     "lib-starter:init-ci": "tsx scripts/lib-starter-init-ci.ts",
