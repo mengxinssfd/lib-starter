@@ -14,10 +14,11 @@ const npmTool = 'pnpm';
 const bin = (name: string) => path.resolve(__dirname, '../node_modules/.bin/' + name);
 const step = (msg: string) => console.log(chalk.cyan(msg));
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
- * @param {string} bin
- * @param {string[]} args
- * @param {{}} opts
+ * @param {string} bin 命令
+ * @param {string[]} args 参数
+ * @param {{}} opts 选项
  */
 const exec = (
   bin: string,

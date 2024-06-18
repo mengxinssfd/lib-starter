@@ -41,10 +41,10 @@ async function runParallel(maxConcurrency: number, source: string[], iteratorFn:
 }
 
 /**
- * @param {string} target
- * @return {Promise<void>}
+ * @param {string} target 打包目标
+ * @returns {Promise<void>}
  */
-async function build(target: string) {
+async function build(target: string): Promise<void> {
   const pkgDirPath = isMonoRepo ? rootDir(`packages/${target}`) : rootPath;
   const pkgJson = require(`${pkgDirPath}/package.json`);
   if (pkgJson.private) return;
