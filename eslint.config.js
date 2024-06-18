@@ -3,6 +3,7 @@ const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommen
 const perfectionist = require('eslint-plugin-perfectionist');
 const prettier = require('eslint-plugin-prettier');
 const tsEslint = require('typescript-eslint');
+const jsdoc = require('eslint-plugin-jsdoc');
 // const eslint = require('@eslint/js');
 //const { FlatCompat } = require('@eslint/eslintrc');
 
@@ -38,25 +39,30 @@ module.exports = tsEslint.config(
           disallowTypeAnnotations: false,
         },
       ],
+      // 优先使用 interface 而不是 type
+      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
       // most of the codebase are expected to be env agnostic
       'no-restricted-globals': ['error', ...DOMGlobals, ...NodeGlobals],
-
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
+
       // Enforce the use of top-level import type qualifier when an import only has specifiers with inline type qualifiers
       '@typescript-eslint/no-import-type-side-effects': 'error',
-      // This rule enforces the preference for using '@ts-expect-error' comments in TypeScript
       // code to indicate intentional type errors, improving code clarity and maintainability.
       '@typescript-eslint/prefer-ts-expect-error': 'error',
+      // This rule enforces the preference for using '@ts-expect-error' comments in TypeScript
       'no-restricted-syntax': ['error', banConstEnum],
       'perfectionist/sort-exports': 'off',
       'no-debugger': 'error',
       'sort-imports': 'off',
+      // 禁止 == 判断
+      eqeqeq: 'error',
     },
     extends: [
       // eslint.configs.recommended,
       tsEslint.configs.base,
       eslintPluginPrettierRecommended,
       perfectionistRecommended,
+      jsdoc.configs['flat/recommended'],
     ],
     plugins: {
       // 'import-x': importX,
@@ -88,6 +94,24 @@ module.exports = tsEslint.config(
     },
     files: ['*.js'],
   },
+  {
+    rules: {
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-empty-function': 'off',
+      '@typescript-eslint/ban-ts-comment': 'off',
+      'jsdoc/require-jsdoc': 'off',
+      eqeqeq: 'off',
+    },
+    files: ['**/__tests__/**'],
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-var-requires': 'off',
+      'jsdoc/require-jsdoc': 'off',
+      eqeqeq: 'off',
+    },
+    files: ['**/scripts/**.[jt]s', 'rollup.config.js'],
+  },
 
   // Node scripts
   {
@@ -96,6 +120,7 @@ module.exports = tsEslint.config(
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       'no-restricted-globals': 'off',
+      'jsdoc/require-jsdoc': 'off',
       'no-console': 'off',
       'no-undef': 'off',
     },
@@ -135,6 +160,7 @@ module.exports = tsEslint.config(
       '.output',
       '*.d.ts',
       'temp',
+      'docs-html',
     ],
   },
 );
