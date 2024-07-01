@@ -96,7 +96,7 @@
     "tsx": "^4.15.5",
     "typedoc": "^0.25.13",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.13.0"
+    "typescript-eslint": "^7.15.0"
   },
   "files": [
     "dist",
