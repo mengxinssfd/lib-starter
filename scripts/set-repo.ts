@@ -1,3 +1,4 @@
+/* eslint-disable perfectionist/sort-objects */
 import { createSrcAndTests, rootDir, useFile } from './utils';
 import { type Config, RepoType } from './pkg-init';
 import { capitalize } from '@tool-pack/basic';
@@ -53,10 +54,15 @@ const multi = {
     pkgJson['exports'] = {
       '.': {
         import: {
-          default: `./dist/${config.name}.esm-bundler.js`,
+          types: `./dist/${config.name}.d.ts`,
           node: `./dist/${config.name}.cjs.js`,
+          // default 必须在最后面，否则某些打包工具会报错
+          default: `./dist/${config.name}.esm-bundler.js`,
         },
-        require: `./dist/${config.name}.cjs.js`,
+        require: {
+          types: `./dist/${config.name}.d.ts`,
+          default: `./dist/${config.name}.cjs.js`,
+        },
       },
     };
     pkgJson['buildOptions'] = {
