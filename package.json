@@ -94,8 +94,8 @@
     "ts-jest": "^29.1.4",
     "tslib": "^2.6.3",
     "tsx": "^4.15.5",
-    "typedoc": "^0.25.13",
-    "typescript": "^5.4.5",
+    "typedoc": "^0.26.3",
+    "typescript": "^5.5.3",
     "typescript-eslint": "^7.13.0"
   },
   "files": [
